@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'components/constants.dart';
 import 'components/profile_list_item.dart';
+import 'widgets/TimelineWidget.dart';
 
 class Profile1 extends StatefulWidget {
   @override
@@ -142,9 +143,19 @@ class _ProfileState extends State<Profile1> {
                         icon: LineAwesomeIcons.user_shield,
                         text: 'Change Password',
                       ),
-                      ProfileListItem(
-                        icon: LineAwesomeIcons.history,
-                        text: 'GiveAway History',
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TimelinePage(
+                                    title: 'Your GiveAway History')),
+                          );
+                        },
+                        child: ProfileListItem(
+                          icon: LineAwesomeIcons.history,
+                          text: 'GiveAway History',
+                        ),
                       ),
                       ProfileListItem(
                         icon: LineAwesomeIcons.question_circle,

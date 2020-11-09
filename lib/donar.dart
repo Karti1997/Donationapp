@@ -13,11 +13,14 @@ class _DonarState extends State<Donar> {
   int pageIndex = 0;
   GlobalKey _bottomNavigationKey = GlobalKey();
 
-  final DonationList _homePage = new DonationList();
+  //final DonationList _homePage = new DonationList();
+  final HomePage _homePage = new HomePage();
   final Donationform _donationPage = new Donationform();
   final Profile _profilePage = new Profile();
 
-  Widget _showPage = new DonationList();
+  //Widget _showPage = new DonationList();
+
+  Widget _showPage = new HomePage();
 
   Widget _pageChooser(int page) {
     switch (page) {

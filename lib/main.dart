@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:giveaway/donar.dart';
+import 'package:giveaway/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,8 +23,10 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/signin': (BuildContext context) => new MyHomePage(),
         '/signup': (BuildContext context) => new SignupPage(),
-        '/donor': (BuildContext context) => new Donar()
+        '/donor': (BuildContext context) => new Donar(),
+        '/loc': (BuildContext context) => new FireMap(),
       },
+      //home: new FireMap(),
       home: new MyHomePage(),
     );
   }

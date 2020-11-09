@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'components/card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:geolocator/geolocator.dart';
 
 class DonationList extends StatefulWidget {
   @override
@@ -11,9 +14,131 @@ class _DonationListState extends State<DonationList> {
   final _pageController = PageController(
     viewportFraction: 0.3,
   );
+  double filterdistance = 1000.0, lati, longi;
+  List<String> _address = [];
+  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  getlocation() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      lati = position.latitude;
+      longi = position.longitude;
+      populateClients();
+    });
+  }
+
+  getaddress(GeoPoint loc) async {
+    List<Placemark> p =
+        await geolocator.placemarkFromCoordinates(loc.latitude, loc.longitude);
+    Placemark place = p[0];
+    setState(() {
+      _address.add("${place.name}");
+    });
+  }
+
+  populateClients() async {
+    await Firebase.initializeApp();
+    var s = FirebaseFirestore.instance.collection('Donation').snapshots();
+    s.toList();
+    setState(() {
+      _creditCards.clear();
+    });
+    s.forEach((element) {
+      element.docs.forEach((element) {
+        var elt = element.data();
+        GeoPoint loc = elt['Itemloc'];
+        print(_address);
+        Geolocator()
+            .distanceBetween(lati, longi, loc.latitude, loc.longitude)
+            .then((dist) {
+          if (dist / 1000 <= filterdistance) {
+            print(elt);
+            setState(() {
+              _creditCards.add(CreditCard(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                ),
+                image: 'assets/g.png',
+                name: (dist / 1000).round().toString() + 'KM Away',
+                number: elt['Itemcontact'],
+                company: Text(
+                  elt['Itemname'],
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                  ),
+                ),
+              ));
+            });
+          }
+        });
+      });
+    });
+  }
+
+  void _showoptions() {
+    TextEditingController distance = new TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Container(
+              width: MediaQuery.of(context).size.width / 1.3,
+              height: MediaQuery.of(context).size.height / 5,
+              child: Column(
+                children: <Widget>[
+                  TextFormField(
+                    controller: distance,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: Colors.black),
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.0),
+                        ),
+                        hintText: 'in kms',
+                        hintStyle: TextStyle(color: Colors.black),
+                        labelText: 'Distance',
+                        labelStyle: TextStyle(color: Colors.black)),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(25.0),
+                    color: Colors.white,
+                    child: MaterialButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          filterdistance = double.parse(distance.text);
+                        });
+                        getlocation();
+                        print(filterdistance);
+                      },
+                      padding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
+                      child: Text(
+                        'Apply',
+                        style: TextStyle(
+                            fontSize: 20.0,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
 
   List<CreditCard> _creditCards = [];
-  /*
+
   @override
   void initState() {
     super.initState();
@@ -122,7 +247,7 @@ class _DonationListState extends State<DonationList> {
       ),
     ];
   }
-  */
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,10 +259,10 @@ class _DonationListState extends State<DonationList> {
               onPressed: () {
                 showSearch(context: context, delegate: Datasearch());
               },
-              icon: Icon(FontAwesomeIcons.search))
+              icon: Icon(FontAwesomeIcons.search)),
+          IconButton(onPressed: _showoptions, icon: Icon(Icons.filter_list))
         ],
       ),
-      drawer: Drawer(),
       body: Center(
         child: PageView.builder(
           controller: _pageController,
@@ -245,7 +370,7 @@ class Datasearch extends SearchDelegate {
   @override
   Widget buildLeading(BuildContext context) {
     // TODO: implement buildLeading
-    return IconButton(
+    /*return IconButton(
       icon: AnimatedIcon(
         icon: AnimatedIcons.menu_arrow,
         progress: transitionAnimation,
@@ -253,7 +378,7 @@ class Datasearch extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-    );
+    );*/
   }
 
   @override
@@ -268,7 +393,6 @@ class Datasearch extends SearchDelegate {
         ),
       ),
     );
-    throw UnimplementedError();
   }
 
   @override
@@ -297,6 +421,47 @@ class Datasearch extends SearchDelegate {
       ),
       itemCount: suggestionlist.length,
     );
-    throw UnimplementedError();
+  }
+}*/
+
+import 'package:flutter/material.dart';
+import 'package:giveaway/widgets/BestDonationWidget.dart';
+
+import 'package:giveaway/widgets/PopularDonation.dart';
+import 'package:giveaway/widgets/SearchWidget.dart';
+import 'package:giveaway/widgets/TopMenus.dart';
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFFFAFAFA),
+        elevation: 0,
+        title: Text(
+          "What you need?",
+          style: TextStyle(
+              color: Color(0xFF3a3737),
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
+        ),
+        brightness: Brightness.light,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            SearchWidget(),
+            TopMenus(),
+            PopularDonationsWidget(),
+            BestDonationWidget(),
+          ],
+        ),
+      ),
+    );
   }
 }
